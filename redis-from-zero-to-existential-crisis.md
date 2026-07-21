@@ -940,14 +940,4 @@ Redis Cluster provides both **data sharding** and **high availability**.
 
 Instead of storing all data on a single server, Redis Cluster distributes data across multiple **primary** nodes. Each primary can have one or more **replicas** for failover.
 
-​​
 
----
-
-## About the Author
-
-I’m Noel Wen, a Senior Backend Engineer specializing in Go, Java, distributed systems, high-concurrency platforms, and cloud-based backend services.
-
-- GitHub: https://github.com/wenyiyi
-- Portfolio: https://ewenone.com
-- Originally published on [Medium](https://medium.com/@qiubaobao7150/redis-from-zero-to-existential-crisis-d4c56ffc1744)
