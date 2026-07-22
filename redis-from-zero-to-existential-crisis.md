@@ -940,4 +940,143 @@ Redis Cluster provides both **data sharding** and **high availability**.
 
 Instead of storing all data on a single server, Redis Cluster distributes data across multiple **primary** nodes. Each primary can have one or more **replicas** for failover.
 
+## 11 Redis in Practice
+### 11.1 Building a Distributed Order ID Generator
+#### 11.1.1 Background
+In e-commerce, payment, and transaction systems, every order requires a globally unique order ID.
 
+A good order ID generator usually needs to provide:
+
+- Global uniqueness
+- Increasing order sequence
+- High performance
+- Distributed deployment support
+
+Using database auto-increment IDs may put heavy pressure on the database under high concurrency.
+Redis provides an efficient solution through its atomic increment operation (INCR).
+
+#### 11.1.2 Order ID Design
+The order ID format:
+```
+Date + Seconds elapsed today + Increment sequence
+```
+
+Example:
+```
+260722468530001
+```
+Breakdown:
+```
+260722 | 46853 | 0001
+Date     Seconds  Sequence
+```
+Meaning:
+```
+260722: July 22, 2026
+46853: Seconds elapsed since midnight
+0001: The first order generated within this second
+```
+#### 11.1.3 Generate Time Component
+First, generate the date:
+```
+val originDateStr =
+    SimpleDateFormat("yyMMdd")
+        .format(currentTime)
+```
+Example:
+```
+2026-07-22
+```
+Converted to:
+```
+260722
+```
+Then calculate seconds elapsed today:
+```
+val differSecond =
+    (currentTime.time - startTime.time) / 1000
+```
+Example:
+```
+13:00:53
+```
+Elapsed seconds:
+```
+46853
+```
+Final Redis key:
+```
+26072246853
+```
+#### 11.1.4 Using Redis INCR for Sequence Generation
+Multiple orders may be created within the same second.
+
+Without a sequence:
+```
+26072246853
+26072246853
+```
+would cause duplicates.
+
+Redis solves this problem using:
+```
+INCR key
+```
+Redis guarantees atomic increment operations.
+
+Example:
+
+First request:
+```
+INCR 26072246853
+```
+Result:
+```
+1
+```
+Second request:
+```
+INCR 26072246853
+```
+Result:
+```
+2
+```
+Generated IDs:
+```
+260722468530001
+260722468530002
+```
+#### 11.1.5 Why Use Redis Lua Script
+**problem** 
+If we execute the commands separately:
+```
+redis.incr(key)
+redis.expire(key, 60)
+```
+there is a potential risk.
+
+Execution flow:
+```
+INCR
+ |
+Application crashes
+ |
+EXPIRE is not executed
+```
+As a result:The Redis key will lose its expiration time and remain permanently stored in Redis.
+**Solution**  
+Use Lua script:
+```
+    @Bean
+    fun incrementScript(): DefaultRedisScript<Long> {
+        val luaScript = """
+        local incr = redis.call('INCR', KEYS[1])
+        if tonumber(incr) == 1 then
+            redis.call('EXPIRE', KEYS[1], ARGV[1]) // The first time to create this key, set the expiration time
+        end
+        return incr // Only increment the count and do not set the expiration time
+    """.trimIndent()
+        return DefaultRedisScript(luaScript, Long::class.java)
+    }
+```
