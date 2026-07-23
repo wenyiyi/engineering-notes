@@ -15,6 +15,11 @@ I'm **Noel Wen**, a Senior Backend Engineer with 8+ years of experience building
 - [MySQL Engineering, Visually](mysql/mysql-engineering-visual-guide/README.md) — Indexes, query plans, transactions, MVCC, locks, online DDL, and sharding.
 - [图解 MySQL 工程实践](mysql/mysql-engineering-visual-guide/README.zh-CN.md) — 中文版。
 
+### Elasticsearch
+
+- [Elasticsearch Made Simple](elasticsearch/elasticsearch-from-search-box-to-cluster/README.md) — Inverted indexes, mappings, query flow, shards, near-real-time search, and reliable MySQL synchronization.
+- [学好 Elasticsearch，搜索问题就没那么吓人了](elasticsearch/elasticsearch-from-search-box-to-cluster/README.zh-CN.md) — 中文版。
+
 ## Topics
 
 - Distributed systems and eventual consistency
