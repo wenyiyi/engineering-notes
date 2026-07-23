@@ -10,6 +10,11 @@ I'm **Noel Wen**, a Senior Backend Engineer with 8+ years of experience building
 
 - [Redis: From Zero to Existential Crisis](redis-from-zero-to-existential-crisis.md) — Data structures, persistence, caching patterns, high availability, and Redis Cluster.
 
+### MySQL
+
+- [MySQL Engineering, Visually](mysql/mysql-engineering-visual-guide/README.md) — Indexes, query plans, transactions, MVCC, locks, online DDL, and sharding.
+- [图解 MySQL 工程实践](mysql/mysql-engineering-visual-guide/README.zh-CN.md) — 中文版。
+
 ## Topics
 
 - Distributed systems and eventual consistency
